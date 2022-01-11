@@ -74,8 +74,8 @@ class Connection extends EventTarget {
 
 	async #senderInit() {
 		this.#defaultDataChannel = this.#peerConnection.createDataChannel('default')
-		this.#defaultDataChannel.onopen = this.#onopen
-		this.#defaultDataChannel.onmessage = this.#onmessage
+		this.#defaultDataChannel.onopen = this.#onopen.bind(this)
+		this.#defaultDataChannel.onmessage = this.#onmessage.bind(this)
 
 		const initialOffer = await this.#peerConnection.createOffer()
 		await this.#peerConnection.setLocalDescription(initialOffer)
@@ -86,7 +86,7 @@ class Connection extends EventTarget {
 		/** @type {RTCDataChannel} */
 		this.#defaultDataChannel = {}
 
-		this.#peerConnection.ondatachannel = this.#changeDataChannel
+		this.#peerConnection.ondatachannel = this.#changeDataChannel.bind(this)
 
 		await this.#peerConnection.setRemoteDescription(offer)
 		const initialAnswer = await this.#peerConnection.createAnswer()
@@ -96,8 +96,8 @@ class Connection extends EventTarget {
 	/** @param {RTCDataChannelEvent} event */
 	#changeDataChannel(event) {
 		this.#defaultDataChannel = event.channel;
-		this.#defaultDataChannel.onopen = this.#onopen
-		this.#defaultDataChannel.onmessage = this.#onmessage
+		this.#defaultDataChannel.onopen = this.#onopen.bind(this)
+		this.#defaultDataChannel.onmessage = this.#onmessage.bind(this)
 	}
 
 	/** @param {Event} evt */
