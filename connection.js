@@ -50,7 +50,7 @@ class Connection extends EventTarget {
 			/** SDP offer/answer */
 			[descName]: { get: () => localDesc },
 			/** SDP offer/answer in string format */
-			[descName + "Text"]: { get: () => toText(localDesc) },
+			[descName + "Text"]: { get: () => this.#toText(localDesc) },
 
 			send: { get: () => this.#defaultDataChannel.send.bind(this.#defaultDataChannel) },
 			state: { get: () => this.#defaultDataChannel.readyState }
