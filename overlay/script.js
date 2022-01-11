@@ -1,8 +1,8 @@
 async function createOffer() {
-	const peerConnection = createPeerConnection(lasticecandidate)
+	let resolveLastICECandidate
+	const lastICECandidatePromise = new Promise(r => resolveLastICECandidate = r)
 
-	const offer = await peerConnection.createOffer()
-	await peerConnection.setLocalDescription(offer)
+	const peerConnection = createPeerConnection(resolveLastICECandidate)
 
 	function createDataChannel(name, onopen, onmessage) {
 		const dataChannel = peerConnection.createDataChannel(name)
@@ -14,10 +14,18 @@ async function createOffer() {
 		}
 	}
 
+	const defaultDataChannel = createDataChannel('default')
+
+	const firstOffer = await peerConnection.createOffer()
+	await peerConnection.setLocalDescription(firstOffer)
+
+	const offer = await lastICECandidatePromise
+
 	return {
 		offer,
 		setAnswer: peerConnection.setRemoteDescription.bind(),
-		createDataChannel
+		createDataChannel,
+		defaultDataChannel
 	}
 }
 
