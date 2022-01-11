@@ -38,13 +38,15 @@ async function receiveOffer(offer) {
 	return Object.assign(events, {
 		get answer() { return answer },
 		get answerText() { return toText(answer) },
-		set defaultDataChannelListener({onopen, onmessage}) {
-			defaultDataChannel.onopen = onopen;
-			defaultDataChannel.onmessage = onmessage;
+		get setDataChannelListener() {
+			return ({ onopen, onmessage }) => {
+				defaultDataChannel.onopen = onopen;
+				defaultDataChannel.onmessage = onmessage;
 
-			return {
-				get send() { return defaultDataChannel.send.bind(defaultDataChannel) },
-				get state() { return defaultDataChannel.readyState }
+				return {
+					get send() { return defaultDataChannel.send.bind(defaultDataChannel) },
+					get state() { return defaultDataChannel.readyState }
+				}
 			}
 		},
 	})
