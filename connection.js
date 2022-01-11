@@ -19,6 +19,8 @@ class Connection extends EventTarget {
 	/** @type {RTCDataChannel} */
 	#defaultDataChannel = {}
 
+	#initialized = false
+
 	constructor() {
 		super()
 
@@ -32,6 +34,8 @@ class Connection extends EventTarget {
 	 * @param {RTCSessionDescriptionInit} [offer] Only used when `type` is "receiver"
 	 */
 	async init(type, offer) {
+		if (this.#initialized) throw new Error('This instance was already initilized.')
+
 		if (type === 'sender') await this.#senderInit()
 		else if (type === 'receiver') await this.#receiverInit(offer)
 		else throw new Error('Invalid type. It must be "sender" or "receiver".')
@@ -42,13 +46,17 @@ class Connection extends EventTarget {
 
 		const descName = { 'sender': 'offer', 'receiver': 'answer' }[type]
 
-		return {
-			get [descName]() { return localDesc },
-			get [descName + "Text"]() { return toText(localDesc) },
+		Object.defineProperties(this, {
+			/** SDP offer/answer */
+			[descName]: { get: () => localDesc },
+			/** SDP offer/answer in string format */
+			[descName + "Text"]: { get: () => toText(localDesc) },
 
-			get send() { return this.#defaultDataChannel.send.bind(this.#defaultDataChannel) },
-			get state() { return this.#defaultDataChannel.readyState }
-		}
+			send: { get: () => this.#defaultDataChannel.send.bind(this.#defaultDataChannel) },
+			state: { get: () => this.#defaultDataChannel.readyState }
+		})
+
+		this.#initialized = true
 	}
 
 	/** @param {RTCPeerConnectionIceEvent} e */
