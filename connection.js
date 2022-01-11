@@ -19,7 +19,7 @@ class Connection extends EventTarget {
 	/** @type {RTCDataChannel} */
 	#defaultDataChannel = {}
 
-	constructor(type, offer) {
+	constructor() {
 		super()
 
 		this.#peerConnection = new RTCPeerConnection(rtcConfiguration)
