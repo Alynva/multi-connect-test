@@ -10,7 +10,14 @@ async function createOffer() {
 	/** @type {ConnectionEvents & EventTarget} */
 	const events = new EventTarget()
 
-	const peerConnection = createPeerConnection(resolveLastICECandidate)
+	/** @type {RTCConfiguration} */
+	const rtcConfiguration = {
+		iceServers: [{
+			urls: "stun:stun.stunprotocol.org"
+		}]
+	};
+	const peerConnection = new RTCPeerConnection(rtcConfiguration)
+	peerConnection.onicecandidate = e => e.candidate == null && resolveLastICECandidate()
 	peerConnection.onconnectionstatechange = e => {
 		events.dispatchEvent(new CustomEvent('statechange', { detail: e.target.connectionState }))
 	}
@@ -25,6 +32,7 @@ async function createOffer() {
 
 	return Object.assign(events, {
 		get offer() { return offer },
+		get offerText() { return toText(offer) },
 		setAnswer: peerConnection.setRemoteDescription.bind(peerConnection),
 		get defaultDataChannel() { return defaultDataChannel },
 		createDataChannel: createDataChannel.bind(this, peerConnection),
@@ -46,4 +54,9 @@ function createDataChannel(peerConnection, name, onopen, onmessage) {
 		get send() { return dataChannel.send.bind(dataChannel) },
 		get state() { return dataChannel.readyState },
 	}
+}
+
+function toText(obj) {
+	return JSON.stringify(obj)
+		.replace(/\\r\\n/g, "\r\n")
 }
