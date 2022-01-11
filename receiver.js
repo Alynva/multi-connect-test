@@ -18,14 +18,19 @@ async function receiveOffer(offer) {
 	}
 
 	/** @type {RTCDataChannel} */
-	let defaultDataChannel
+	let defaultDataChannel = {}
 	peerConnection.ondatachannel = event => {
+		let onopen, onmessage
 		if (defaultDataChannel) {
+			onopen = defaultDataChannel.onopen
+			onmessage = defaultDataChannel.onmessage
 			defaultDataChannel.onopen = null
 			defaultDataChannel.onmessage = null
 		}
 
 		defaultDataChannel = event.channel;
+		if (onopen) defaultDataChannel.onopen = onopen
+		if (onmessage) defaultDataChannel.onmessage = onmessage
 	};
 
 	await peerConnection.setRemoteDescription(offer)
