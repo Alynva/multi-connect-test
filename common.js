@@ -14,7 +14,7 @@ const rtcConfiguration = {
 function createPeerConnection(lasticecandidate) {
 	const peerConnection = new RTCPeerConnection(rtcConfiguration);
 
-	// peerConnection.onicecandidate = handleicecandidate(lasticecandidate);
+	peerConnection.onicecandidate = handleicecandidate(lasticecandidate);
 	peerConnection.onconnectionstatechange = handleconnectionstatechange;
 	peerConnection.oniceconnectionstatechange = handleiceconnectionstatechange;
 	return peerConnection;
