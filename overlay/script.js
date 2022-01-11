@@ -2,7 +2,12 @@ async function createOffer() {
 	let resolveLastICECandidate
 	const lastICECandidatePromise = new Promise(r => resolveLastICECandidate = r)
 
+	const events = new EventTarget()
+
 	const peerConnection = createPeerConnection(resolveLastICECandidate)
+	peerConnection.onconnectionstatechange = (ev) => {
+		events.dispatchEvent(new CustomEvent('statechange', { detail: ev }))
+	}
 
 	const defaultDataChannel = createDataChannel(peerConnection, 'default')
 
@@ -12,12 +17,12 @@ async function createOffer() {
 	await lastICECandidatePromise
 	const offer = peerConnection.localDescription
 
-	return {
+	return Object.assign(events, {
 		offer,
 		setAnswer: peerConnection.setRemoteDescription,
 		createDataChannel: createDataChannel.bind(this, peerConnection),
 		defaultDataChannel,
-	}
+	})
 }
 
 /**
