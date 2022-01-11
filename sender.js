@@ -1,27 +1,33 @@
+/**
+ * @typedef ConnectionEvents
+ * @property {(e: "statechange", listener: (state: RTCPeerConnectionState) => void) => void} addEventListener
+ */
+
 async function createOffer() {
 	let resolveLastICECandidate
 	const lastICECandidatePromise = new Promise(r => resolveLastICECandidate = r)
 
+	/** @type {ConnectionEvents & EventTarget} */
 	const events = new EventTarget()
 
 	const peerConnection = createPeerConnection(resolveLastICECandidate)
-	peerConnection.onconnectionstatechange = (ev) => {
-		events.dispatchEvent(new CustomEvent('statechange', { detail: ev }))
+	peerConnection.onconnectionstatechange = e => {
+		events.dispatchEvent(new CustomEvent('statechange', { detail: e.target.connectionState }))
 	}
 
 	const defaultDataChannel = createDataChannel(peerConnection, 'default')
 
-	const firstOffer = await peerConnection.createOffer()
-	await peerConnection.setLocalDescription(firstOffer)
+	const initialOffer = await peerConnection.createOffer()
+	await peerConnection.setLocalDescription(initialOffer)
 
 	await lastICECandidatePromise
 	const offer = peerConnection.localDescription
 
 	return Object.assign(events, {
-		offer,
+		get offer() { return offer },
 		setAnswer: peerConnection.setRemoteDescription,
+		get defaultDataChannel() { return defaultDataChannel },
 		createDataChannel: createDataChannel.bind(this, peerConnection),
-		defaultDataChannel,
 	})
 }
 
@@ -38,6 +44,6 @@ function createDataChannel(peerConnection, name, onopen, onmessage) {
 
 	return {
 		send: dataChannel.send,
-		state: dataChannel.readyState,
+		get state() { return dataChannel.readyState },
 	}
 }
