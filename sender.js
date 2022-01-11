@@ -25,7 +25,7 @@ async function createOffer() {
 
 	return Object.assign(events, {
 		get offer() { return offer },
-		setAnswer: peerConnection.setRemoteDescription,
+		setAnswer: peerConnection.setRemoteDescription.bind(peerConnection),
 		get defaultDataChannel() { return defaultDataChannel },
 		createDataChannel: createDataChannel.bind(this, peerConnection),
 	})
@@ -43,7 +43,7 @@ function createDataChannel(peerConnection, name, onopen, onmessage) {
 	dataChannel.onmessage = onmessage
 
 	return {
-		send: dataChannel.send,
+		get send() { return dataChannel.send.bind(dataChannel) },
 		get state() { return dataChannel.readyState },
 	}
 }

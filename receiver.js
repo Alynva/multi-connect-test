@@ -35,7 +35,7 @@ async function receiveOffer(offer) {
 			defaultDataChannel.onmessage = onmessage;
 
 			return {
-				send: defaultDataChannel.send,
+				get send() { return defaultDataChannel.send.bind(defaultDataChannel) },
 				get state() { return defaultDataChannel.readyState }
 			}
 		},
