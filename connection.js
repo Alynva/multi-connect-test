@@ -22,7 +22,7 @@ class Connection extends EventTarget {
 	constructor() {
 		super()
 
-		this.#peerConnection = new RTCPeerConnection(rtcConfiguration)
+		this.#peerConnection = new RTCPeerConnection(this.#config)
 		this.#peerConnection.onicecandidate = this.#onICECandidateListener
 		this.#peerConnection.onconnectionstatechange = this.#stateChange
 	}
