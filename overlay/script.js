@@ -4,16 +4,6 @@ async function createOffer() {
 
 	const peerConnection = createPeerConnection(resolveLastICECandidate)
 
-	function createDataChannel(name, onopen, onmessage) {
-		const dataChannel = peerConnection.createDataChannel(name)
-		dataChannel.onopen = onopen
-		dataChannel.onmessage = onmessage
-
-		return {
-			send: dataChannel.send.bind(),
-		}
-	}
-
 	const defaultDataChannel = createDataChannel('default')
 
 	const firstOffer = await peerConnection.createOffer()
@@ -24,19 +14,25 @@ async function createOffer() {
 
 	return {
 		offer,
-		setAnswer: peerConnection.setRemoteDescription.bind(),
-		createDataChannel,
-		defaultDataChannel
+		setAnswer: peerConnection.setRemoteDescription,
+		createDataChannel: createDataChannel.bind(this, peerConnection),
+		defaultDataChannel,
 	}
 }
 
-function lasticecandidate() {
-	offer = peerConnection.localDescription
-	console.log({offer})
-}
+/**
+ * @param {RTCPeerConnection} peerConnection 
+ * @param {tring} name 
+ * @param {(this: RTCDataChannel, ev: Event) => any} onopen 
+ * @param {(this: RTCDataChannel, ev: MessageEvent<any>) => any} onmessage 
+ */
+function createDataChannel(peerConnection, name, onopen, onmessage) {
+	const dataChannel = peerConnection.createDataChannel(name)
+	dataChannel.onopen = onopen
+	dataChannel.onmessage = onmessage
 
-function test() {
-	const onopen = () => console.log('connected')
-	const onmessage = message => console.log({ message })
-	return createOffer(onopen, onmessage)
+	return {
+		send: dataChannel.send,
+		state: dataChannel.readyState,
+	}
 }
