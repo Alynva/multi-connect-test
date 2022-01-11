@@ -1,49 +1,33 @@
-let peerConnection
-function createOffer() {
-	peerConnection = createPeerConnection(lasticecandidate);
-	dataChannel = peerConnection.createDataChannel('chat');
-	dataChannel.onopen = datachannelopen;
-	dataChannel.onmessage = datachannelmessage;
-	createOfferPromise = peerConnection.createOffer();
-	createOfferPromise.then(createOfferDone, createOfferFailed);
-}
+async function createOffer() {
+	const peerConnection = createPeerConnection(lasticecandidate)
 
-function createOfferDone(offer) {
-	console.log('createOfferDone');
-	setLocalPromise = peerConnection.setLocalDescription(offer);
-	setLocalPromise.then(setLocalDone, setLocalFailed);
-}
+	const offer = await peerConnection.createOffer()
+	await peerConnection.setLocalDescription(offer)
 
-function createOfferFailed(reason) {
-	console.log('createOfferFailed');
-	console.log({reason});
-}
+	function createDataChannel(name, onopen, onmessage) {
+		const dataChannel = peerConnection.createDataChannel(name)
+		dataChannel.onopen = onopen
+		dataChannel.onmessage = onmessage
 
-function setLocalDone() {
-	console.log('setLocalDone');
-}
+		return {
+			send: dataChannel.send.bind(),
+		}
+	}
 
-function setLocalFailed(reason) {
-	console.log('setLocalFailed');
-	console.log({reason});
+	return {
+		offer,
+		setAnswer: peerConnection.setRemoteDescription.bind(),
+		createDataChannel
+	}
 }
 
 function lasticecandidate() {
-	offer = peerConnection.localDescription;
+	offer = peerConnection.localDescription
 	console.log({offer})
 }
 
-function answerPasted(answer) {
-	answer = JSON.parse(textelement.value);
-	setRemotePromise = peerConnection.setRemoteDescription(answer);
-	setRemotePromise.then(setRemoteDone, setRemoteFailed);
-}
-
-function setRemoteDone() {
-	console.log('setRemoteDone');
-}
-
-function setRemoteFailed(reason) {
-	console.log('setRemoteFailed');
-	console.log({reason});
+function test() {
+	const onopen = () => console.log('connected')
+	const onmessage = message => console.log({ message })
+	return createOffer(onopen, onmessage)
 }
