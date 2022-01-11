@@ -30,7 +30,7 @@ async function receiveOffer(offer) {
 
 	return Object.assign(events, {
 		get answer() { return answer },
-		set defaultDataChannelListener(onopen, onmessage) {
+		set defaultDataChannelListener({onopen, onmessage}) {
 			defaultDataChannel.onopen = onopen;
 			defaultDataChannel.onmessage = onmessage;
 
