@@ -25,8 +25,8 @@ class Connection extends EventTarget {
 		super()
 
 		this.#peerConnection = new RTCPeerConnection(this.#config)
-		this.#peerConnection.onicecandidate = this.#onICECandidateListener
-		this.#peerConnection.onconnectionstatechange = this.#stateChange
+		this.#peerConnection.onicecandidate = this.#onICECandidateListener.bind(this)
+		this.#peerConnection.onconnectionstatechange = this.#stateChange.bind(this)
 	}
 
 	/**
