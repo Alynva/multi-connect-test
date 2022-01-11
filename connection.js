@@ -56,6 +56,10 @@ class Connection extends EventTarget {
 			state: { get: () => this.#defaultDataChannel.readyState }
 		})
 
+		if (type === 'sender') Object.defineProperty(this, 'setAnswer', {
+			get: peerConnection.setRemoteDescription.bind(peerConnection),
+		})
+
 		this.#initialized = true
 	}
 
