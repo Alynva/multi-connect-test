@@ -45,17 +45,9 @@ class Connection extends EventTarget {
 		return {
 			get [descName]() { return localDesc },
 			get [descName + "Text"]() { return toText(localDesc) },
-			get setDataListener() {
-				return ({ onopen, onmessage }) => {
-					this.#defaultDataChannel.onopen = onopen;
-					this.#defaultDataChannel.onmessage = onmessage;
 
-					return {
-						get send() { return this.#defaultDataChannel.send.bind(this.#defaultDataChannel) },
-						get state() { return this.#defaultDataChannel.readyState }
-					}
-				}
-			}
+			get send() { return this.#defaultDataChannel.send.bind(this.#defaultDataChannel) },
+			get state() { return this.#defaultDataChannel.readyState }
 		}
 	}
 
