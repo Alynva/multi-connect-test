@@ -82,7 +82,7 @@ class Connection extends EventTarget {
 	}
 
 	/** @param {RTCSessionDescriptionInit} offer */
-	#receiverInit(offer) {
+	async #receiverInit(offer) {
 		/** @type {RTCDataChannel} */
 		this.#defaultDataChannel = {}
 
