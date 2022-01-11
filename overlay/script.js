@@ -19,7 +19,8 @@ async function createOffer() {
 	const firstOffer = await peerConnection.createOffer()
 	await peerConnection.setLocalDescription(firstOffer)
 
-	const offer = await lastICECandidatePromise
+	await lastICECandidatePromise
+	const offer = peerConnection.localDescription
 
 	return {
 		offer,
