@@ -4,7 +4,7 @@ async function createOffer() {
 
 	const peerConnection = createPeerConnection(resolveLastICECandidate)
 
-	const defaultDataChannel = createDataChannel('default')
+	const defaultDataChannel = createDataChannel(peerConnection, 'default')
 
 	const firstOffer = await peerConnection.createOffer()
 	await peerConnection.setLocalDescription(firstOffer)
@@ -23,8 +23,8 @@ async function createOffer() {
 /**
  * @param {RTCPeerConnection} peerConnection 
  * @param {tring} name 
- * @param {(this: RTCDataChannel, ev: Event) => any} onopen 
- * @param {(this: RTCDataChannel, ev: MessageEvent<any>) => any} onmessage 
+ * @param {(this: RTCDataChannel, ev: Event) => any} [onopen] 
+ * @param {(this: RTCDataChannel, ev: MessageEvent<any>) => any} [onmessage] 
  */
 function createDataChannel(peerConnection, name, onopen, onmessage) {
 	const dataChannel = peerConnection.createDataChannel(name)
