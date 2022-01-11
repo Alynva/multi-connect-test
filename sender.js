@@ -22,7 +22,7 @@ async function createOffer() {
 		events.dispatchEvent(new CustomEvent('statechange', { detail: e.target.connectionState }))
 	}
 
-	const defaultDataChannel = createDataChannel(peerConnection, 'default')
+	const defaultDataChannel = peerConnection.createDataChannel('default')
 
 	const initialOffer = await peerConnection.createOffer()
 	await peerConnection.setLocalDescription(initialOffer)
@@ -34,8 +34,17 @@ async function createOffer() {
 		get offer() { return offer },
 		get offerText() { return toText(offer) },
 		setAnswer: peerConnection.setRemoteDescription.bind(peerConnection),
-		get defaultDataChannel() { return defaultDataChannel },
-		createDataChannel: createDataChannel.bind(this, peerConnection),
+		get setDataChannelListener() {
+			return ({ onopen, onmessage }) => {
+				defaultDataChannel.onopen = onopen;
+				defaultDataChannel.onmessage = onmessage;
+
+				return {
+					get send() { return defaultDataChannel.send.bind(defaultDataChannel) },
+					get state() { return defaultDataChannel.readyState }
+				}
+			}
+		},
 	})
 }
 
