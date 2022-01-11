@@ -57,7 +57,7 @@ class Connection extends EventTarget {
 		})
 
 		if (type === 'sender') Object.defineProperty(this, 'setAnswer', {
-			get: peerConnection.setRemoteDescription.bind(peerConnection),
+			get: this.#peerConnection.setRemoteDescription.bind(this.#peerConnection),
 		})
 
 		this.#initialized = true
